@@ -19,7 +19,7 @@ pipeline {
         CC  = '/usr/bin/gcc-7'
         CXX = '/usr/bin/g++-7'
         CARES_VERSION = "${params.CARES_VERSION}"
-        CARES_PREFIX = "${env.HOME}/thirdparty/c-ares-${params.CARES_VERSION}"
+        CARES_PREFIX = "${env.HOME}/thirdparty/c-ares/${params.CARES_VERSION}"
     }
     stages {
         stage('Cleanup') {
