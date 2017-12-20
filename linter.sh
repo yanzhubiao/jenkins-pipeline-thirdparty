@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+#
+# https://jenkins.io/doc/book/pipeline/development/#linter
+#
+
 JENKINS_URL=https://jenkins.intranet.rog2.org
 
 jenkinsfile=$1
