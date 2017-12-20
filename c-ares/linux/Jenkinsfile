@@ -38,7 +38,8 @@ pipeline {
                         ignoreExternalsOption: true,
                     ]],
                     quietOperation: false,
-                    workspaceUpdater: [$class: 'UpdateUpdater']
+                    // No need to update, because we clean workspace everytime
+                    workspaceUpdater: [$class: 'NoopUpdater']
                 ])
             }
         }
