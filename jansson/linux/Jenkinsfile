@@ -1,0 +1,56 @@
+#!/usr/bin/env groovy
+
+def svnRepo = 'svn://svn.xsjme.com/rog2/pirates/trunk/server/thirdparty/jansson'
+def svnCredentialsId = 'subversion'
+
+pipeline {
+    agent {
+        label "ubuntu:16.04"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'JANSSON_VERSION',
+            defaultValue: '2.10',
+            description: 'See: https://github.com/akheron/jansson/releases')
+    }
+    environment {
+        CC  = '/usr/bin/gcc-7'
+        CXX = '/usr/bin/g++-7'
+        JANSSON_VERSION = "${params.JANSSON_VERSION}"
+        JANSSON_PREFIX = "${env.HOME}/thirdparty/jansson/${params.JANSSON_VERSION}"
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'SubversionSCM',
+                    locations: [[
+                        credentialsId: svnCredentialsId,
+                        remote: svnRepo,
+                        local: '.',
+                        depthOption: 'files',
+                        ignoreExternalsOption: true,
+                    ]],
+                    quietOperation: false,
+                    workspaceUpdater: [$class: 'UpdateUpdater']
+                ])
+            }
+        }
+        stage('Build') {
+            steps {
+                sh './build-linux.sh'
+            }
+        }
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.JANSSON_PREFIX, zipFile: "jansson-${env.JANSSON_VERSION}-linux.zip"
+            }
+        }
+    }
+}
