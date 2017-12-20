@@ -1,0 +1,64 @@
+#!/usr/bin/env groovy
+
+def svnRepo = 'svn://svn.xsjme.com/rog2/pirates/trunk/server/thirdparty/libjwt'
+def svnCredentialsId = 'subversion'
+
+pipeline {
+    agent {
+        label "ubuntu:16.04"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'LIBJWT_VERSION',
+            defaultValue: '1.8.0',
+            description: 'See: https://github.com/benmcollins/libjwt/releases')
+        string(name: 'JANSSON_VERSION',
+            defaultValue: '2.10',
+            description: 'See: https://github.com/akheron/jansson/releases')
+        string(name: 'OPENSSL_VERSION',
+            defaultValue: '1.1.0f',
+            description: 'See: https://www.openssl.org/source/')
+    }
+    environment {
+        CC  = '/usr/bin/gcc-7'
+        CXX = '/usr/bin/g++-7'
+        LIBJWT_VERSION = "${params.LIBJWT_VERSION}"
+        LIBJWT_PREFIX = "${env.HOME}/thirdparty/libjwt/${params.LIBJWT_VERSION}"
+        JANSSON_PREFIX = "${env.HOME}/thirdparty/jansson/${params.JANSSON_VERSION}"
+        OPENSSL_PREFIX = "${env.HOME}/thirdparty/openssl/${params.OPENSSL_VERSION}"
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'SubversionSCM',
+                    locations: [[
+                        credentialsId: svnCredentialsId,
+                        remote: svnRepo,
+                        local: '.',
+                        depthOption: 'files',
+                        ignoreExternalsOption: true,
+                    ]],
+                    quietOperation: false,
+                    workspaceUpdater: [$class: 'UpdateUpdater']
+                ])
+            }
+        }
+        stage('Build') {
+            steps {
+                sh './build-linux.sh'
+            }
+        }
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.LIBJWT_PREFIX, zipFile: "libjwt-${env.LIBJWT_VERSION}-linux.zip"
+            }
+        }
+    }
+}
