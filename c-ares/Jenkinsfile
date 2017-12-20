@@ -1,0 +1,56 @@
+#!/usr/bin/env groovy
+
+def svnRepo = 'svn://svn.xsjme.com/rog2/pirates/trunk/server/thirdparty/c-ares'
+def svnCredentialsId = 'subversion'
+
+pipeline {
+    agent {
+        label "ubuntu:16.04"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'CARES_VERSION',
+            defaultValue: '1.13.0',
+            description: 'See: https://c-ares.haxx.se/')
+    }
+    environment {
+        CC  = '/usr/bin/gcc-7'
+        CXX = '/usr/bin/g++-7'
+        CARES_VERSION = "${params.CARES_VERSION}"
+        CARES_PREFIX = "${env.HOME}/thirdparty/c-ares-${params.CARES_VERSION}"
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'SubversionSCM',
+                    locations: [[
+                        credentialsId: svnCredentialsId,
+                        remote: svnRepo,
+                        local: '.',
+                        depthOption: 'files',
+                        ignoreExternalsOption: true,
+                    ]],
+                    quietOperation: false,
+                    workspaceUpdater: [$class: 'UpdateUpdater']
+                ])
+            }
+        }
+        stage('Build') {
+            steps {
+                sh './build-linux.sh'
+            }
+        }
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.CARES_PREFIX, zipFile: "c-ares-${env.CARES_VERSION}-linux.zip"
+            }
+        }
+    }
+}
