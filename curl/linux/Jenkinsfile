@@ -1,0 +1,64 @@
+#!/usr/bin/env groovy
+
+def svnRepo = 'svn://svn.xsjme.com/rog2/pirates/trunk/server/thirdparty/curl'
+def svnCredentialsId = 'subversion'
+
+pipeline {
+    agent {
+        label "ubuntu:16.04"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'CURL_VERSION',
+            defaultValue: '7.54.1',
+            description: 'See: https://curl.haxx.se/download.html')
+        string(name: 'CARES_VERSION',
+            defaultValue: '1.13.0',
+            description: 'See: https://c-ares.haxx.se/')
+        string(name: 'OPENSSL_VERSION',
+            defaultValue: '1.1.0f',
+            description: 'See: https://www.openssl.org/source/')
+    }
+    environment {
+        CC  = '/usr/bin/gcc-7'
+        CXX = '/usr/bin/g++-7'
+        CURL_VERSION = "${params.CURL_VERSION}"
+        CURL_PREFIX = "${env.HOME}/thirdparty/curl/${params.CURL_VERSION}"
+        CARES_PREFIX = "${env.HOME}/thirdparty/c-ares/${params.CARES_VERSION}"
+        OPENSSL_PREFIX = "${env.HOME}/thirdparty/openssl/${params.OPENSSL_VERSION}"
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'SubversionSCM',
+                    locations: [[
+                        credentialsId: svnCredentialsId,
+                        remote: svnRepo,
+                        local: '.',
+                        depthOption: 'files',
+                        ignoreExternalsOption: true,
+                    ]],
+                    quietOperation: false,
+                    workspaceUpdater: [$class: 'UpdateUpdater']
+                ])
+            }
+        }
+        stage('Build') {
+            steps {
+                sh './build-linux.sh'
+            }
+        }
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.CURL_PREFIX, zipFile: "curl-${env.CURL_VERSION}-linux.zip"
+            }
+        }
+    }
+}
