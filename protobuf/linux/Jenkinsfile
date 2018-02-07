@@ -5,7 +5,7 @@ def svnCredentialsId = 'subversion'
 
 pipeline {
     agent {
-        label "ubuntu:16.04"
+        label "ubuntu:16.04 && thirdparty"
     }
     options {
         skipDefaultCheckout()
