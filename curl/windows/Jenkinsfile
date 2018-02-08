@@ -1,0 +1,38 @@
+#!/usr/bin/env groovy
+
+def gitRepo = 'https://github.com/rog2/build-libcurl-windows'
+
+pipeline {
+    agent {
+        label "windows:10 && thirdparty"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'CURL_VERSION',
+            defaultValue: '7.58.0',
+            description: 'See: https://curl.haxx.se/download.html')
+    }
+    environment {
+        CURL_VERSION = "${params.CURL_VERSION}"
+        CURL_PREFIX = "${env.WORKSPACE}/third-party/libcurl"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git gitRepo
+            }
+        }
+        stage('Build') {
+            steps {
+                bat 'build.bat'
+            }
+        }
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.CURL_PREFIX, zipFile: "curl-${env.CURL_VERSION}-windows.zip"
+            }
+        }
+    }
+}
