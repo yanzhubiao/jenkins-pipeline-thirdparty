@@ -1,0 +1,45 @@
+#!/usr/bin/env groovy
+
+def gitRepo = 'https://github.com/rog2/recastnavigation-ue4'
+
+pipeline {
+    agent {
+        label "ubuntu:16.04 && thirdparty"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'RECASTNAVIGATION_UE4_VERSION',
+            defaultValue: '4.16')
+    }
+    environment {
+        CC  = '/usr/bin/gcc-7'
+        CXX = '/usr/bin/g++-7'
+        RECASTNAVIGATION_UE4_VERSION = "${params.RECASTNAVIGATION_UE4_VERSION}"
+        RECASTNAVIGATION_UE4_PREFIX = "${env.WORKSPACE}/_build"
+        RECASTNAVIGATION_UE4_ZIP = "recastnavigation-ue4-${params.RECASTNAVIGATION_UE4_VERSION}-linux.zip"
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout') {
+            steps {
+                git gitRepo
+            }
+        }
+        stage('Build') {
+            steps {
+                sh './build-linux.sh RelWithDebInfo'
+            }
+        }
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.RECASTNAVIGATION_UE4_PREFIX, zipFile: env.RECASTNAVIGATION_UE4_ZIP
+            }
+        }
+    }
+}
