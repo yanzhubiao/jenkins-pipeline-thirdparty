@@ -1,0 +1,55 @@
+#!/usr/bin/env groovy
+
+def svnRepo = 'svn://svn.xsjme.com/rog2/pirates/trunk/server/thirdparty/protobuf'
+def svnCredentialsId = 'subversion'
+
+pipeline {
+    agent {
+        label "windows:10 && thirdparty"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'PROTOBUF_VERSION',
+            defaultValue: '3.0.0',
+            description: 'See: https://github.com/google/protobuf/releases')
+    }
+    environment {
+        PROTOBUF_VERSION = "${params.PROTOBUF_VERSION}"
+        PROTOBUF_PREFIX = "${env.WORKSPACE}/protobuf-${params.PROTOBUF_VERSION}-windows"
+        PROTOBUF_ZIP = "protobuf-${params.PROTOBUF_VERSION}-windows.zip"
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'SubversionSCM',
+                    locations: [[
+                        credentialsId: svnCredentialsId,
+                        remote: svnRepo,
+                        local: '.',
+                        depthOption: 'files',
+                        ignoreExternalsOption: true,
+                    ]],
+                    quietOperation: false,
+                    workspaceUpdater: [$class: 'UpdateUpdater']
+                ])
+            }
+        }
+        stage('Build') {
+            steps {
+                bat 'build-windows.bat'
+            }
+        }
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.PROTOBUF_PREFIX, zipFile: env.PROTOBUF_ZIP
+            }
+        }
+    }
+}
