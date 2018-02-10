@@ -1,0 +1,46 @@
+#!/usr/bin/env groovy
+
+pipeline {
+    agent {
+        label "ubuntu:16.04 && thirdparty"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'LUA_VERSION',
+            defaultValue: '5.3.4')
+    }
+    environment {
+        CC  = '/usr/bin/gcc-7'
+        LUA_VERSION = "${params.LUA_VERSION}"
+        LUA_PREFIX = "${env.HOME}/thirdparty/lua/${params.LUA_VERSION}"
+        LUA_ZIP = "lua-${params.LUA_VERSION}-linux.zip"
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Download') {
+            steps {
+                sh "wget -q http://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz"
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "tar zxvf lua-${LUA_VERSION}.tar.gz"
+                dir("lua-${LUA_VERSION}") {
+                    sh "make linux CC=${env.CC}"
+                    sh "make install INSTALL_TOP=${env.LUA_PREFIX}"
+                }
+            }
+        }
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.LUA_PREFIX, zipFile: env.LUA_ZIP
+            }
+        }
+    }
+}
