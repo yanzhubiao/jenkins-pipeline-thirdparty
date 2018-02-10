@@ -15,7 +15,7 @@ pipeline {
     }
     environment {
         RECASTNAVIGATION_UE4_VERSION = "${params.RECASTNAVIGATION_UE4_VERSION}"
-        RECASTNAVIGATION_UE4_PREFIX = "${env.WORKSPACE}\_build"
+        RECASTNAVIGATION_UE4_PREFIX = "${env.WORKSPACE}\\_build"
         RECASTNAVIGATION_UE4_ZIP = "recastnavigation-ue4-${params.RECASTNAVIGATION_UE4_VERSION}-windows.zip"
     }
     stages {
