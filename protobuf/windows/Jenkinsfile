@@ -43,7 +43,9 @@ pipeline {
         }
         stage('Build') {
             steps {
-                bat 'build-windows.bat'
+                withCMake('3.10.1') {
+                    bat 'build-windows.bat'
+                }
             }
         }
         stage('Archive') {
