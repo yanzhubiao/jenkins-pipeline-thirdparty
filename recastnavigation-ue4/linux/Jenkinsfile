@@ -33,7 +33,9 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh './build-linux.sh RelWithDebInfo'
+                withCMake('3.10.1') {
+                    sh './build-linux.sh RelWithDebInfo'
+                }
             }
         }
         stage('Archive') {
