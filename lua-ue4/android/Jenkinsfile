@@ -1,0 +1,50 @@
+#!/usr/bin/env groovy
+
+def gitRepo = 'https://github.com/rog2/lua-ue4.git'
+
+pipeline {
+    agent {
+        label "ubuntu:16.04 && thirdparty"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'LUA_UE4_VERSION',
+            defaultValue: '5.3.5')
+    }
+    environment {
+        LUA_UE4_VERSION             = "${params.LUA_UE4_VERSION}"
+        LUA_UE4_PREFIX              = "${env.HOME}/thirdparty/lua-ue4/${params.LUA_UE4_VERSION}"
+        LUA_UE4_ZIP                 = "lua-ue4-${params.LUA_UE4_VERSION}-android.zip"
+
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+        
+        stage('Download') {
+            steps {
+                git gitRepo
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                withCMake("3.10.1")
+                {
+                    sh './Build_Android.sh'
+                }
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.LUA_UE4_PREFIX, zipFile: env.LUA_UE4_ZIP
+            }
+        }
+    }
+}
