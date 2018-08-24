@@ -1,0 +1,77 @@
+#!/usr/bin/env groovy
+
+def gitRepo = 'https://github.com/rog2/protobuf-ue4.git'
+
+ENGINE_LOCAL_DIR = 'UnrealEngine'
+ENGINE_SYS = 'Linux'
+
+pipeline {
+    agent {
+        label "ubuntu:16.04 && thirdparty"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'PROTOBUF_UE4_VERSION',
+            defaultValue: '3.6.1')
+        booleanParam(name: 'CLEAN_WS',
+            defaultValue: false,
+            description: 'When checked, call function cleanWs.')
+    }
+    environment {
+        PROTOBUF_UE4_WORKSPACE           = "${env.WORKSPACE}"
+        UE4_ROOT                         = "${env.WORKSPACE}/UnrealEngine"
+        PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
+        PROTOBUF_UE4_PREFIX              = "${env.HOME}/thirdparty/protobuf-ue4/${params.PROTOBUF_UE4_VERSION}"
+        PROTOBUF_UE4_ZIP                 = "protobuf-ue4-${params.PROTOBUF_UE4_VERSION}-linux.zip"
+
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                    if (params.CLEAN_WS) {
+                        cleanWs()
+                    }
+                }
+            }
+        }
+
+        stage('Download') {
+            steps {
+                git gitRepo
+            }
+        }
+
+        stage('Git Engine') {
+            steps {
+                script {
+                    def ue4CleanBuild = !fileExists(ENGINE_LOCAL_DIR)
+                    if (ue4CleanBuild) {
+                        buildEngine.ue4Checkout(ENGINE_LOCAL_DIR, ENGINE_SYS)
+                        dir(ENGINE_LOCAL_DIR) {
+                            buildEngine.ue4Setup(ENGINE_SYS, '')               
+                        }
+                    } 
+                }
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                withCMake("3.10.1")
+                {
+                    sh 'rm -rf *.zip'
+                    sh './Build_Linux.sh'
+                }
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.PROTOBUF_UE4_PREFIX, zipFile: env.PROTOBUF_UE4_ZIP
+            }
+        }
+    }
+}

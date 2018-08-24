@@ -1,0 +1,50 @@
+#!/usr/bin/env groovy
+
+def gitRepo = 'https://github.com/rog2/protobuf-ue4.git'
+
+pipeline {
+    agent {
+        label "windows:10 && thirdparty"
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    parameters {
+        string(name: 'PROTOBUF_UE4_VERSION',
+            defaultValue: '3.6.1')
+    }
+    environment {
+        PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
+        PROTOBUF_UE4_PREFIX              = "${env.WORKSPACE}\\third-party\\protobuf-ue4\\${params.PROTOBUF_UE4_VERSION}"
+        PROTOBUF_UE4_ZIP                 = "protobuf-ue4-${params.PROTOBUF_UE4_VERSION}-windows.zip"
+
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+        
+        stage('Download') {
+            steps {
+                git gitRepo
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                withCMake("3.10.1")
+                {
+                    bat 'Build_Windows.bat'
+                }
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                zip archive: true, dir: env.PROTOBUF_UE4_PREFIX, zipFile: env.PROTOBUF_UE4_ZIP
+            }
+        }
+    }
+}
