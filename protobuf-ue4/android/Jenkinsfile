@@ -4,7 +4,7 @@ def gitRepo = 'https://github.com/rog2/protobuf-ue4.git'
 
 pipeline {
     agent {
-        label "ubuntu:16.04 && thirdparty"
+        label "ubuntu:18.04 && thirdparty"
     }
     options {
         skipDefaultCheckout()
@@ -34,8 +34,7 @@ pipeline {
         
         stage('Build') {
             steps {
-                withCMake("3.10.1")
-                {
+                withCMake('3.12.2') {
                     sh './Build_Android.sh'
                 }
             }

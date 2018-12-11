@@ -12,12 +12,14 @@ pipeline {
     parameters {
         string(name: 'PROTOBUF_UE4_VERSION',
             defaultValue: '3.6.1')
+        string(name: 'MACOS_DEPLOYMENT_TARGET',
+            defaultValue: '10.12')
     }
     environment {
         PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
         PROTOBUF_UE4_PREFIX              = "${env.HOME}/thirdparty/protobuf-ue4/${params.PROTOBUF_UE4_VERSION}"
         PROTOBUF_UE4_ZIP                 = "protobuf-ue4-${params.PROTOBUF_UE4_VERSION}-mac.zip"
-
+        PROTOBUF_UE4_MACOS_DEPLOYMENT_TARGET = "${params.MACOS_DEPLOYMENT_TARGET}"
     }
     stages {
         stage('Cleanup') {
@@ -34,7 +36,9 @@ pipeline {
         
         stage('Build') {
             steps {
-                sh './Build_Mac.sh'
+                withCMake('3.12.2') {
+                    sh './Build_Mac.sh'
+                }
             }
         }
 

@@ -34,8 +34,7 @@ pipeline {
         
         stage('Build') {
             steps {
-                withCMake("3.10.1")
-                {
+                withCMake('3.12.2') {
                     bat 'Build_Windows.bat'
                 }
             }
