@@ -15,7 +15,7 @@ pipeline {
     }
     environment {
         PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
-        PROTOBUF_UE4_PREFIX              = "${env.HOME}/thirdparty/protobuf-ue4/${params.PROTOBUF_UE4_VERSION}"
+        PROTOBUF_UE4_PREFIX              = "${env.HOME}/thirdparty/protobuf-ue4/${params.PROTOBUF_UE4_VERSION}/android"
         PROTOBUF_UE4_ZIP                 = "protobuf-ue4-${params.PROTOBUF_UE4_VERSION}-android.zip"
 
     }

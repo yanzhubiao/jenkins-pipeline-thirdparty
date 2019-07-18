@@ -17,7 +17,7 @@ pipeline {
     }
     environment {
         PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
-        PROTOBUF_UE4_PREFIX              = "${env.HOME}/thirdparty/protobuf-ue4/${params.PROTOBUF_UE4_VERSION}"
+        PROTOBUF_UE4_PREFIX              = "${env.HOME}/thirdparty/protobuf-ue4/${params.PROTOBUF_UE4_VERSION}/mac"
         PROTOBUF_UE4_ZIP                 = "protobuf-ue4-${params.PROTOBUF_UE4_VERSION}-mac.zip"
         PROTOBUF_UE4_MACOS_DEPLOYMENT_TARGET = "${params.MACOS_DEPLOYMENT_TARGET}"
     }

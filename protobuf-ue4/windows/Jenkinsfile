@@ -15,7 +15,7 @@ pipeline {
     }
     environment {
         PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
-        PROTOBUF_UE4_PREFIX              = "${env.WORKSPACE}\\third-party\\protobuf-ue4\\${params.PROTOBUF_UE4_VERSION}"
+        PROTOBUF_UE4_PREFIX              = "${env.WORKSPACE}\\third-party\\protobuf-ue4\\${params.PROTOBUF_UE4_VERSION}\\windows"
         PROTOBUF_UE4_ZIP                 = "protobuf-ue4-${params.PROTOBUF_UE4_VERSION}-windows.zip"
 
     }
