@@ -17,7 +17,7 @@ pipeline {
     }
     environment {
         LUA_UE4_VERSION = "${params.LUA_UE4_VERSION}"
-        LUA_UE4_PREFIX  = "${env.HOME}/thirdparty/lua-ue4/${params.LUA_UE4_VERSION}"
+        LUA_UE4_PREFIX  = "${env.HOME}/thirdparty/lua-ue4/${params.LUA_UE4_VERSION}/linux"
         LUA_UE4_ZIP     = "lua-ue4-${params.LUA_UE4_VERSION}-linux.zip"
         CC              = "${params.CC}"
         MYCFLAGS        = "${params.MYCFLAGS}"
