@@ -10,8 +10,9 @@ pipeline {
         skipDefaultCheckout()
     }
     parameters {
-        string(name: 'PROTOBUF_UE4_VERSION',
-            defaultValue: '3.6.1')
+        string(name: 'PROTOBUF_UE4_VERSION', defaultValue: '3.6.1')
+        string(name: 'MYCFLAGS', defaultValue: '')
+        string(name: 'MYLDFLAGS', defaultValue: '')
     }
     environment {
         PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
