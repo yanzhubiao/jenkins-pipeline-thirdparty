@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def gitRepo = 'https://github.com/rog2/lua-ue4.git'
+def gitRepo = 'https://github.com/kingsoftgames/lua-ue4.git'
 
 pipeline {
     agent {

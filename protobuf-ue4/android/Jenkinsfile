@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def gitRepo = 'https://github.com/rog2/protobuf-ue4.git'
+def gitRepo = 'https://github.com/kingsoftgames/protobuf-ue4.git'
 
 pipeline {
     agent {
@@ -13,12 +13,15 @@ pipeline {
         string(name: 'PROTOBUF_UE4_VERSION', defaultValue: '3.9.2')
         string(name: 'MYCFLAGS', defaultValue: '')
         string(name: 'MYLDFLAGS', defaultValue: '')
+        string(name: 'ANDROID_NDK',
+            defaultValue: 'r21c',
+            description: 'The Jenkins Android NDK tools, like r12b r21c')
     }
     environment {
         PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
         PROTOBUF_UE4_PREFIX              = "${env.HOME}/thirdparty/protobuf-ue4/${params.PROTOBUF_UE4_VERSION}/android"
         PROTOBUF_UE4_ZIP                 = "protobuf-ue4-${params.PROTOBUF_UE4_VERSION}-android.zip"
-
+        ANDROID_NDK                      = "${params.ANDROID_NDK}"
     }
     stages {
         stage('Cleanup') {
@@ -36,7 +39,9 @@ pipeline {
         stage('Build') {
             steps {
                 withCMake('3.12.2') {
-                    sh './Build_Android.sh'
+                    withAndroidNdk(params.ANDROID_NDK) {
+                        sh './Build_Android.sh'
+                    }
                 }
             }
         }

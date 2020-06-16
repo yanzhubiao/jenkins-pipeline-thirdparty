@@ -1,6 +1,11 @@
 #!/usr/bin/env groovy
 
-def gitRepo = 'https://github.com/rog2/protobuf-ue4.git'
+def gitRepo = 'https://github.com/kingsoftgames/protobuf-ue4.git'
+
+def getCompilerChoices() {
+    def choices = ['2017', '2019']
+    return choices.join('\n')
+}
 
 pipeline {
     agent {
@@ -12,12 +17,14 @@ pipeline {
     parameters {
         string(name: 'PROTOBUF_UE4_VERSION',
             defaultValue: '3.9.2')
+        choice(name: 'COMPILER',
+            choices: getCompilerChoices(),
+            description: 'The Visual Studio compiler.')
     }
     environment {
         PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
         PROTOBUF_UE4_PREFIX              = "${env.WORKSPACE}\\third-party\\protobuf-ue4\\${params.PROTOBUF_UE4_VERSION}\\windows"
         PROTOBUF_UE4_ZIP                 = "protobuf-ue4-${params.PROTOBUF_UE4_VERSION}-windows.zip"
-
     }
     stages {
         stage('Cleanup') {

@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def gitRepo = 'https://github.com/rog2/protobuf-ue4.git'
+def gitRepo = 'https://github.com/kingsoftgames/protobuf-ue4.git'
 
 pipeline {
     agent {
@@ -13,7 +13,7 @@ pipeline {
         string(name: 'PROTOBUF_UE4_VERSION',
             defaultValue: '3.9.2')
         string(name: 'IOS_DEPLOYMENT_TARGET',
-            defaultValue: '9.0')
+            defaultValue: '11.0')
     }
     environment {
         PROTOBUF_UE4_VERSION             = "${params.PROTOBUF_UE4_VERSION}"
