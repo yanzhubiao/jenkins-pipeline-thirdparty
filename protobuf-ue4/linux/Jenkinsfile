@@ -2,6 +2,10 @@
 
 def gitRepo = 'https://github.com/yanzhubiao/protobuf-ue4.git'
 
+import com.kingsoft.shiyou.pirates.*
+
+ue4Build = new UE4Build(this)
+
 ENGINE_LOCAL_DIR = 'UnrealEngine'
 ENGINE_SYS = 'Linux'
 
@@ -72,14 +76,14 @@ pipeline {
                 script {
                     def ue4CleanBuild = !fileExists(ENGINE_LOCAL_DIR)
                     if (ue4CleanBuild) {
-                        buildEngine.ue4Checkout(ENGINE_LOCAL_DIR, ENGINE_SYS, params.ENGINE_BRANCH)
+                        ue4Build.ue4Checkout(ENGINE_LOCAL_DIR, ENGINE_SYS, params.ENGINE_BRANCH)
                         dir(ENGINE_LOCAL_DIR) {
-                            buildEngine.ue4Setup(ENGINE_SYS, '')
+                            ue4Build.ue4Setup(ENGINE_SYS, '')
                         }
                     }
 
                     dir(ENGINE_LOCAL_DIR) {
-                        def engineVersion = buildEngine.getEngineVersion()
+                        def engineVersion = ue4Build.getEngineVersion()
                         echo "Engine version : ${engineVersion}"
                         def engineToolChain = getToolChain(engineVersion)
                         if (engineToolChain == null) {
