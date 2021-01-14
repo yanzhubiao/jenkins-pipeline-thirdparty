@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def gitRepo = 'https://github.com/kingsoftgames/protobuf-ue4.git'
+def gitRepo = 'https://github.com/yanzhubiao/protobuf-ue4.git'
 
 pipeline {
     agent {
@@ -11,7 +11,7 @@ pipeline {
     }
     parameters {
         string(name: 'PROTOBUF_UE4_VERSION',
-            defaultValue: '3.9.2')
+            defaultValue: '3.14.0')
         string(name: 'MACOS_DEPLOYMENT_TARGET',
             defaultValue: '10.15')
     }
@@ -30,7 +30,7 @@ pipeline {
         
         stage('Download') {
             steps {
-                git gitRepo
+                git url: gitRepo, branch: 'v3.14.0'
             }
         }
         

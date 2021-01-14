@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def gitRepo = 'https://github.com/kingsoftgames/protobuf-ue4.git'
+def gitRepo = 'https://github.com/yanzhubiao/protobuf-ue4.git'
 
 def getCompilerChoices() {
     def choices = ['2017', '2019']
@@ -16,7 +16,7 @@ pipeline {
     }
     parameters {
         string(name: 'PROTOBUF_UE4_VERSION',
-            defaultValue: '3.9.2')
+            defaultValue: '3.14.0')
         choice(name: 'COMPILER',
             choices: getCompilerChoices(),
             description: 'The Visual Studio compiler.')
@@ -35,7 +35,7 @@ pipeline {
         
         stage('Download') {
             steps {
-                git gitRepo
+                git url: gitRepo, branch: 'v3.14.0'
             }
         }
         

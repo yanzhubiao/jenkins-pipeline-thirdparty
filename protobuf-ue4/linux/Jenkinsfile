@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def gitRepo = 'https://github.com/kingsoftgames/protobuf-ue4.git'
+def gitRepo = 'https://github.com/yanzhubiao/protobuf-ue4.git'
 
 ENGINE_LOCAL_DIR = 'UnrealEngine'
 ENGINE_SYS = 'Linux'
@@ -35,7 +35,7 @@ pipeline {
         skipDefaultCheckout()
     }
     parameters {
-        string(name: 'PROTOBUF_UE4_VERSION', defaultValue: '3.9.2')
+        string(name: 'PROTOBUF_UE4_VERSION', defaultValue: '3.14.0')
         string(name: 'MYCFLAGS', defaultValue: '')
         string(name: 'MYLDFLAGS', defaultValue: '')
         string(name: 'ENGINE_BRANCH', defaultValue: 'release')
@@ -63,7 +63,7 @@ pipeline {
 
         stage('Download') {
             steps {
-                git gitRepo
+                git url: gitRepo, branch: 'v3.14.0'
             }
         }
 
